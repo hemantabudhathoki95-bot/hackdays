@@ -1,0 +1,892 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Smart Solutions — Modern Guides for Daily Life</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    /* --- CSS VARIABLES & THEME CONFIGURATION --- */
+    :root {
+      --bg-primary: #f8fafc;
+      --bg-surface: #ffffff;
+      --bg-card: #ffffff;
+      --text-primary: #0f172a;
+      --text-secondary: #475569;
+      --text-muted: #94a3b8;
+      --accent-primary: #2563eb;
+      --accent-hover: #1d4ed8;
+      --accent-soft: rgba(37, 99, 235, 0.08);
+      --emerald: #10b981;
+      --emerald-soft: rgba(16, 185, 129, 0.1);
+      --border-color: #e2e8f0;
+      --shadow-sm: 0 1px 3px rgba(0,0,0,0.05);
+      --shadow-md: 0 4px 20px -2px rgba(0, 0, 0, 0.05);
+      --shadow-lg: 0 12px 30px -4px rgba(0, 0, 0, 0.08);
+      --radius-sm: 8px;
+      --radius-md: 14px;
+      --radius-lg: 20px;
+      --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    [data-theme="dark"] {
+      --bg-primary: #0b0f19;
+      --bg-surface: #111827;
+      --bg-card: #1f2937;
+      --text-primary: #f9fafb;
+      --text-secondary: #9ca3af;
+      --text-muted: #6b7280;
+      --accent-primary: #3b82f6;
+      --accent-hover: #60a5fa;
+      --accent-soft: rgba(59, 130, 246, 0.15);
+      --emerald: #34d399;
+      --emerald-soft: rgba(52, 211, 153, 0.15);
+      --border-color: #1f2937;
+      --shadow-sm: 0 1px 3px rgba(0,0,0,0.3);
+      --shadow-md: 0 4px 20px -2px rgba(0, 0, 0, 0.3);
+      --shadow-lg: 0 12px 30px -4px rgba(0, 0, 0, 0.4);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg-primary);
+      color: var(--text-primary);
+      transition: background-color 0.3s ease, color 0.3s ease;
+      line-height: 1.6;
+    }
+
+    /* --- NAVIGATION BAR --- */
+    .navbar {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(255, 255, 255, 0.8);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border-color);
+      transition: var(--transition);
+    }
+
+    [data-theme="dark"] .navbar {
+      background: rgba(17, 24, 39, 0.8);
+    }
+
+    .nav-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0.9rem 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 1.25rem;
+      font-weight: 800;
+      color: var(--text-primary);
+      text-decoration: none;
+      letter-spacing: -0.5px;
+    }
+
+    .logo-badge {
+      background: linear-gradient(135deg, var(--accent-primary), var(--emerald));
+      color: white;
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1rem;
+      font-weight: 700;
+    }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .theme-toggle, .saved-btn {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      color: var(--text-primary);
+      padding: 8px 14px;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      font-size: 0.88rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: var(--transition);
+    }
+
+    .theme-toggle:hover, .saved-btn:hover {
+      border-color: var(--accent-primary);
+      color: var(--accent-primary);
+    }
+
+    /* --- HERO SECTION --- */
+    .hero {
+      padding: 4.5rem 1.5rem 3rem;
+      text-align: center;
+      max-width: 850px;
+      margin: 0 auto;
+    }
+
+    .hero-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--accent-soft);
+      color: var(--accent-primary);
+      padding: 6px 16px;
+      border-radius: 50px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      margin-bottom: 1.2rem;
+      border: 1px solid rgba(37, 99, 235, 0.2);
+    }
+
+    .hero h1 {
+      font-size: clamp(2.2rem, 5vw, 3.4rem);
+      font-weight: 800;
+      line-height: 1.15;
+      letter-spacing: -1px;
+      margin-bottom: 1.2rem;
+    }
+
+    .hero h1 span {
+      background: linear-gradient(135deg, var(--accent-primary), var(--emerald));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .hero p {
+      font-size: 1.125rem;
+      color: var(--text-secondary);
+      max-width: 620px;
+      margin: 0 auto 2rem;
+    }
+
+    /* --- SEARCH & FILTERS --- */
+    .search-box {
+      max-width: 540px;
+      margin: 0 auto 2.5rem;
+      position: relative;
+    }
+
+    .search-input {
+      width: 100%;
+      padding: 16px 20px 16px 48px;
+      background: var(--bg-surface);
+      border: 2px solid var(--border-color);
+      border-radius: var(--radius-md);
+      font-size: 1rem;
+      color: var(--text-primary);
+      box-shadow: var(--shadow-md);
+      transition: var(--transition);
+      outline: none;
+    }
+
+    .search-input:focus {
+      border-color: var(--accent-primary);
+      box-shadow: 0 0 0 4px var(--accent-soft);
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-muted);
+      font-size: 1.1rem;
+    }
+
+    .categories {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 3rem;
+    }
+
+    .category-btn {
+      padding: 8px 18px;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: 50px;
+      color: var(--text-secondary);
+      font-weight: 600;
+      font-size: 0.88rem;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .category-btn:hover, .category-btn.active {
+      background: var(--accent-primary);
+      color: white;
+      border-color: var(--accent-primary);
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
+    }
+
+    /* --- MAIN CONTENT GRID --- */
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 1.5rem 4rem;
+    }
+
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      margin-bottom: 1.8rem;
+    }
+
+    .section-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+    }
+
+    .solutions-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 24px;
+    }
+
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      box-shadow: var(--shadow-sm);
+      transition: var(--transition);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-lg);
+      border-color: rgba(37, 99, 235, 0.3);
+    }
+
+    .card-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+
+    .card-tag {
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      padding: 4px 10px;
+      border-radius: 6px;
+      background: var(--accent-soft);
+      color: var(--accent-primary);
+    }
+
+    .card-time {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    .card-title {
+      font-size: 1.2rem;
+      font-weight: 700;
+      margin-bottom: 0.6rem;
+      line-height: 1.35;
+      color: var(--text-primary);
+    }
+
+    .card-excerpt {
+      font-size: 0.92rem;
+      color: var(--text-secondary);
+      margin-bottom: 1.5rem;
+      flex-grow: 1;
+    }
+
+    .card-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-top: 1px solid var(--border-color);
+      padding-top: 1rem;
+      margin-top: auto;
+    }
+
+    .btn-read {
+      color: var(--accent-primary);
+      font-weight: 700;
+      font-size: 0.88rem;
+      background: none;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      transition: var(--transition);
+    }
+
+    .btn-read:hover {
+      gap: 8px;
+    }
+
+    .btn-bookmark {
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      font-size: 1.1rem;
+      transition: var(--transition);
+      padding: 4px;
+    }
+
+    .btn-bookmark:hover, .btn-bookmark.saved {
+      color: #f59e0b;
+    }
+
+    /* --- INTERACTIVE WIDGET SECTION --- */
+    .widget-section {
+      background: linear-gradient(135deg, var(--bg-surface), var(--bg-primary));
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: 2.5rem 2rem;
+      margin: 4rem 0;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+      align-items: center;
+      box-shadow: var(--shadow-md);
+    }
+
+    @media (max-width: 768px) {
+      .widget-section {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .widget-info h2 {
+      font-size: 1.8rem;
+      font-weight: 800;
+      margin-bottom: 0.8rem;
+      letter-spacing: -0.5px;
+    }
+
+    .widget-info p {
+      color: var(--text-secondary);
+      margin-bottom: 1.5rem;
+      font-size: 0.98rem;
+    }
+
+    .generator-box {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 1.8rem;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .generator-output {
+      min-height: 90px;
+      font-size: 1.05rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      border: 2px dashed var(--border-color);
+      border-radius: var(--radius-sm);
+      padding: 1rem;
+      margin-bottom: 1.2rem;
+      background: var(--bg-primary);
+    }
+
+    .btn-generate {
+      width: 100%;
+      padding: 12px;
+      background: var(--accent-primary);
+      color: white;
+      border: none;
+      border-radius: var(--radius-sm);
+      font-weight: 700;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .btn-generate:hover {
+      background: var(--accent-hover);
+    }
+
+    /* --- MODAL DIALOG --- */
+    .modal-overlay {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(4px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      opacity: 0;
+      pointer-events: none;
+      transition: var(--transition);
+      padding: 1.5rem;
+    }
+
+    .modal-overlay.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .modal {
+      background: var(--bg-surface);
+      border-radius: var(--radius-lg);
+      max-width: 650px;
+      width: 100%;
+      max-height: 85vh;
+      overflow-y: auto;
+      padding: 2.2rem;
+      box-shadow: var(--shadow-lg);
+      transform: translateY(20px);
+      transition: var(--transition);
+      position: relative;
+    }
+
+    .modal-overlay.active .modal {
+      transform: translateY(0);
+    }
+
+    .modal-close {
+      position: absolute;
+      top: 1.2rem;
+      right: 1.2rem;
+      background: var(--bg-primary);
+      border: 1px solid var(--border-color);
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      color: var(--text-secondary);
+      font-weight: bold;
+    }
+
+    .modal-steps {
+      margin-top: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .step-item {
+      display: flex;
+      gap: 1rem;
+      align-items: flex-start;
+      background: var(--bg-primary);
+      padding: 1rem;
+      border-radius: var(--radius-sm);
+      border-left: 3px solid var(--accent-primary);
+    }
+
+    .step-num {
+      background: var(--accent-primary);
+      color: white;
+      font-size: 0.8rem;
+      font-weight: 800;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    /* --- FOOTER --- */
+    footer {
+      border-top: 1px solid var(--border-color);
+      background: var(--bg-surface);
+      padding: 3rem 1.5rem 2rem;
+      text-align: center;
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+    }
+
+    .footer-links {
+      display: flex;
+      justify-content: center;
+      gap: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .footer-links a {
+      color: var(--text-secondary);
+      text-decoration: none;
+      font-weight: 600;
+      transition: var(--transition);
+    }
+
+    .footer-links a:hover {
+      color: var(--accent-primary);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <header class="navbar">
+    <div class="nav-container">
+      <a href="#" class="logo">
+        <span class="logo-badge">⚡</span>
+        <span>SmartSolutions</span>
+      </a>
+      <div class="nav-actions">
+        <button class="saved-btn" id="savedFilterBtn">
+          🔖 Saved (<span id="savedCount">0</span>)
+        </button>
+        <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+          🌙 Dark Mode
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- HERO SECTION -->
+  <section class="hero">
+    <div class="hero-pill">💡 Practical Life Engineering</div>
+    <h1>Simple Hacks & <span>Smart Solutions</span> for Daily Life</h1>
+    <p>Curated, actionable strategies to optimize your productivity, home organization, finances, and well-being in under 5 minutes.</p>
+
+    <!-- SEARCH BAR -->
+    <div class="search-box">
+      <span class="search-icon">🔍</span>
+      <input type="text" id="searchInput" class="search-input" placeholder="Search a problem (e.g. sleep, budget, focus, kitchen)..." />
+    </div>
+
+    <!-- CATEGORY FILTERS -->
+    <div class="categories" id="categoryContainer">
+      <button class="category-btn active" data-category="all">All Solutions</button>
+      <button class="category-btn" data-category="productivity">⚡ Productivity</button>
+      <button class="category-btn" data-category="home">🏠 Home & Tech</button>
+      <button class="category-btn" data-category="finance">💰 Smart Finance</button>
+      <button class="category-btn" data-category="wellness">🌿 Wellness</button>
+    </div>
+  </section>
+
+  <!-- MAIN SOLUTIONS GRID -->
+  <main class="container">
+    <div class="section-header">
+      <h2 class="section-title" id="gridTitle">Popular Solutions</h2>
+    </div>
+
+    <div class="solutions-grid" id="solutionsGrid">
+      <!-- Cards rendered via JavaScript -->
+    </div>
+
+    <!-- INTERACTIVE SMART TOOL WIDGET -->
+    <section class="widget-section">
+      <div class="widget-info">
+        <h2>Need an Instant Fix?</h2>
+        <p>Stuck on a daily problem? Click below to generate a quick, high-impact life hack you can apply immediately today.</p>
+        <div style="font-size: 0.88rem; color: var(--emerald); font-weight: 700;">✓ Science-backed & Tested</div>
+      </div>
+      <div class="generator-box">
+        <div class="generator-output" id="randomTipOutput">
+          Click "Generate Quick Hack" to discover a new daily solution!
+        </div>
+        <button class="btn-generate" id="generateBtn">🎲 Generate Quick Hack</button>
+      </div>
+    </section>
+  </main>
+
+  <!-- MODAL DIALOG FOR FULL SOLUTIONS -->
+  <div class="modal-overlay" id="modalOverlay">
+    <div class="modal">
+      <button class="modal-close" id="modalClose">&times;</button>
+      <span class="card-tag" id="modalTag">Productivity</span>
+      <h2 id="modalTitle" style="font-size: 1.6rem; margin: 0.8rem 0; font-weight: 800;">Solution Title</h2>
+      <p id="modalDesc" style="color: var(--text-secondary); margin-bottom: 1.2rem;">Detailed description...</p>
+      
+      <h4 style="font-size: 1rem; font-weight: 700;">Step-by-Step Execution:</h4>
+      <div class="modal-steps" id="modalSteps">
+        <!-- Steps rendered dynamically -->
+      </div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-links">
+      <a href="#">Home</a>
+      <a href="#">Categories</a>
+      <a href="#">Submit a Tip</a>
+      <a href="#">Privacy Policy</a>
+    </div>
+    <p>© 2026 SmartSolutions. Practical guides for effortless living.</p>
+  </footer>
+
+  <script>
+    /* --- DATA SET: SMART DAILY SOLUTIONS --- */
+    const solutions = [
+      {
+        id: 1,
+        title: "The 2-Minute Rule to Defeat Micro-Procrastination",
+        category: "productivity",
+        readTime: "2 min read",
+        excerpt: "If a task takes less than 2 minutes to perform, do it immediately rather than writing it on a to-do list.",
+        description: "Small tasks like answering an email, taking out trash, or putting away shoes cause mental clutter when deferred. Eliminating them on the spot frees up significant cognitive bandwidth.",
+        steps: [
+          "Identify tasks as they appear throughout your day.",
+          "Ask yourself: 'Will this take under 120 seconds?'",
+          "If yes, perform it immediately without opening your task manager.",
+          "If no, defer it into a structured time block on your calendar."
+        ]
+      },
+      {
+        id: 2,
+        title: "Automated 50/30/20 Savings Pipeline",
+        category: "finance",
+        readTime: "4 min read",
+        excerpt: "Automate your paycheck distribution on payday so saving money requires zero willpower.",
+        description: "Willpower is a bad budgeting strategy. By setting up automatic bank transfers the moment your paycheck hits, you ensure investments and savings grow seamlessly.",
+        steps: [
+          "Set direct deposit to split income across two accounts automatically.",
+          "Allocate 50% for Needs (Rent, Utilities, Food).",
+          "Route 20% directly into High-Yield Savings / Investment Accounts.",
+          "Keep 30% in checking for guilt-free personal spending."
+        ]
+      },
+      {
+        id: 3,
+        title: "The 20-20-20 Rule for Digital Eye Strain",
+        category: "wellness",
+        readTime: "2 min read",
+        excerpt: "Prevent screen-induced fatigue and dry eyes during long work sessions with micro-rests.",
+        description: "Staring at digital displays reduces blink rate by up to 50%, causing physical eye fatigue and headaches. Use this clinically backed micro-break rule.",
+        steps: [
+          "Set a recurring silent timer for every 20 minutes of screen work.",
+          "Look away from screen to an object at least 20 feet away.",
+          "Hold focus on that distant object for a full 20 seconds.",
+          "Blink intentionally 5 times to re-moisten your eyes."
+        ]
+      },
+      {
+        id: 4,
+        title: "Cable Management via Color-Coded Velcro Ties",
+        category: "home",
+        readTime: "3 min read",
+        excerpt: "Eliminate workspace cord chaos and reduce dust accumulation under desk setups.",
+        description: "Tangled cables waste time during troubleshooting and degrade desk aesthetics. A simple bundling framework keeps power cords neat and accessible.",
+        steps: [
+          "Unplug and untangle all desktop cords entirely.",
+          "Group cables by function (e.g., Display, Power, Peripherals).",
+          "Secure bundles using reusable velcro straps instead of zip ties.",
+          "Mount a under-desk cable tray to keep power bricks off the floor."
+        ]
+      },
+      {
+        id: 5,
+        title: "Batch Cooking Base Ingredients for 15-Minute Meals",
+        category: "home",
+        readTime: "5 min read",
+        excerpt: "Prep core carbohydrates and proteins in bulk on Sunday to assemble quick weeknight dinners.",
+        description: "Instead of cooking complete meals, cook multi-use components (roasted veggies, quinoa, chicken/tofu) that can be recombined into bowls, wraps, or stir-fries.",
+        steps: [
+          "Cook a large batch of grains (brown rice, quinoa) and store in airtight containers.",
+          "Roast two trays of versatile vegetables (peppers, broccoli, sweet potatoes).",
+          "Prepare 1-2 protein bases with neutral seasoning.",
+          "Mix and match with different sauces (teriyaki, pesto, tahini) each evening."
+        ]
+      },
+      {
+        id: 6,
+        title: "The 'One Touch' Mail & Notification Habit",
+        category: "productivity",
+        readTime: "3 min read",
+        excerpt: "Process incoming digital and physical mail immediately upon receipt to keep inbox at zero.",
+        description: "Touching mail multiple times (opening, reading, closing, re-reading later) multiplies time spent. Handle items once and immediately assign a final action.",
+        steps: [
+          "Open email or physical mail only during designated daily processing times.",
+          "Apply one of four actions immediately: Delete, Delegate, Do (if <2 min), or Defer.",
+          "Archive or recycle immediately after taking action.",
+          "Never leave items sitting in an unorganized inbox state."
+        ]
+      }
+    ];
+
+    const randomHacks = [
+      "Freeze leftover tomato paste or broth in ice cube trays for easy 1-tbsp portion cooking later.",
+      "Put your phone charger across the room so you must physically stand up to stop your morning alarm.",
+      "Use the '30-Day Rule' before buying non-essential items: wait 30 days to see if you still want it.",
+      "Store bed sheet sets inside one of their matching pillowcases to keep your closet neat.",
+      "Use Ctrl+Shift+T (Cmd+Shift+T on Mac) to instantly restore any web browser tab you accidentally closed."
+    ];
+
+    /* --- APP STATE & DOM ELEMENTS --- */
+    let savedIds = JSON.parse(localStorage.getItem('smart_saved_ids')) || [];
+    let currentCategory = 'all';
+
+    const solutionsGrid = document.getElementById('solutionsGrid');
+    const searchInput = document.getElementById('searchInput');
+    const categoryContainer = document.getElementById('categoryContainer');
+    const themeToggle = document.getElementById('themeToggle');
+    const savedCount = document.getElementById('savedCount');
+    const savedFilterBtn = document.getElementById('savedFilterBtn');
+    const modalOverlay = document.getElementById('modalOverlay');
+    const modalClose = document.getElementById('modalClose');
+
+    /* --- RENDER CARDS --- */
+    function renderCards() {
+      const query = searchInput.value.toLowerCase().trim();
+      solutionsGrid.innerHTML = '';
+
+      const filtered = solutions.filter(sol => {
+        const matchesCategory = (currentCategory === 'all') || 
+                                (currentCategory === 'saved' ? savedIds.includes(sol.id) : sol.category === currentCategory);
+        const matchesSearch = sol.title.toLowerCase().includes(query) || 
+                              sol.excerpt.toLowerCase().includes(query) ||
+                              sol.category.toLowerCase().includes(query);
+        return matchesCategory && matchesSearch;
+      });
+
+      if (filtered.length === 0) {
+        solutionsGrid.innerHTML = `
+          <div style="grid-column: 1/-1; text-align: center; padding: 3rem 1rem; color: var(--text-muted);">
+            <p style="font-size: 1.2rem; font-weight: 600;">No solutions found matching your criteria.</p>
+            <p style="font-size: 0.9rem; margin-top: 0.5rem;">Try adjusting your search terms or filters.</p>
+          </div>
+        `;
+        return;
+      }
+
+      filtered.forEach(sol => {
+        const isSaved = savedIds.includes(sol.id);
+        const card = document.createElement('div');
+        card.className = 'card';
+        card.innerHTML = `
+          <div>
+            <div class="card-meta">
+              <span class="card-tag">${sol.category}</span>
+              <span class="card-time">⏱️ ${sol.readTime}</span>
+            </div>
+            <h3 class="card-title">${sol.title}</h3>
+            <p class="card-excerpt">${sol.excerpt}</p>
+          </div>
+          <div class="card-footer">
+            <button class="btn-read" onclick="openModal(${sol.id})">Read Guide →</button>
+            <button class="btn-bookmark ${isSaved ? 'saved' : ''}" onclick="toggleSave(${sol.id})" title="${isSaved ? 'Remove Bookmark' : 'Save Solution'}">
+              ${isSaved ? '🔖' : '🏷️'}
+            </button>
+          </div>
+        `;
+        solutionsGrid.appendChild(card);
+      });
+
+      savedCount.textContent = savedIds.length;
+    }
+
+    /* --- INTERACTION HANDLERS --- */
+    function toggleSave(id) {
+      if (savedIds.includes(id)) {
+        savedIds = savedIds.filter(item => item !== id);
+      } else {
+        savedIds.push(id);
+      }
+      localStorage.setItem('smart_saved_ids', JSON.stringify(savedIds));
+      renderCards();
+    }
+
+    function openModal(id) {
+      const sol = solutions.find(s => s.id === id);
+      if (!sol) return;
+
+      document.getElementById('modalTag').textContent = sol.category;
+      document.getElementById('modalTitle').textContent = sol.title;
+      document.getElementById('modalDesc').textContent = sol.description;
+
+      const stepsContainer = document.getElementById('modalSteps');
+      stepsContainer.innerHTML = sol.steps.map((step, idx) => `
+        <div class="step-item">
+          <div class="step-num">${idx + 1}</div>
+          <div style="font-size: 0.95rem; color: var(--text-primary); font-weight: 500;">${step}</div>
+        </div>
+      `).join('');
+
+      modalOverlay.classList.add('active');
+    }
+
+    modalClose.addEventListener('click', () => modalOverlay.classList.remove('active'));
+    modalOverlay.addEventListener('click', (e) => {
+      if (e.target === modalOverlay) modalOverlay.classList.remove('active');
+    });
+
+    /* --- CATEGORY & SEARCH LISTENERS --- */
+    categoryContainer.addEventListener('click', (e) => {
+      if (e.target.classList.contains('category-btn')) {
+        document.querySelectorAll('.category-btn').forEach(btn => btn.classList.remove('active'));
+        e.target.classList.add('active');
+        currentCategory = e.target.dataset.category;
+        document.getElementById('gridTitle').textContent = e.target.textContent + ' Guides';
+        renderCards();
+      }
+    });
+
+    searchInput.addEventListener('input', renderCards);
+
+    savedFilterBtn.addEventListener('click', () => {
+      document.querySelectorAll('.category-btn').forEach(btn => btn.classList.remove('active'));
+      currentCategory = 'saved';
+      document.getElementById('gridTitle').textContent = '🔖 Saved Bookmarks';
+      renderCards();
+    });
+
+    /* --- THEME TOGGLE --- */
+    themeToggle.addEventListener('click', () => {
+      const currentTheme = document.documentElement.getAttribute('data-theme');
+      const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', newTheme);
+      themeToggle.textContent = newTheme === 'dark' ? '☀️ Light Mode' : '🌙 Dark Mode';
+    });
+
+    /* --- INSTANT RANDOM HACK GENERATOR --- */
+    document.getElementById('generateBtn').addEventListener('click', () => {
+      const output = document.getElementById('randomTipOutput');
+      const randomItem = randomHacks[Math.floor(Math.random() * randomHacks.length)];
+      output.style.opacity = '0';
+      setTimeout(() => {
+        output.textContent = `💡 "${randomItem}"`;
+        output.style.opacity = '1';
+      }, 150);
+    });
+
+    /* INITIAL RENDER */
+    renderCards();
+  </script>
+</body>
+</html>

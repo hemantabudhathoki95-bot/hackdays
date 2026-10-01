@@ -1,0 +1,821 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SciQuiz: STEM Mastery & Visual Challenge</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts Inter & Outfit -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
+    <!-- FontAwesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        display: ['Outfit', 'sans-serif'],
+                    },
+                    colors: {
+                        physics: { light: '#60a5fa', DEFAULT: '#3b82f6', dark: '#1d4ed8', glow: 'rgba(59, 130, 246, 0.5)' },
+                        chemistry: { light: '#34d399', DEFAULT: '#10b981', dark: '#047857', glow: 'rgba(16, 185, 129, 0.5)' },
+                        math: { light: '#f472b6', DEFAULT: '#ec4899', dark: '#be185d', glow: 'rgba(236, 72, 153, 0.5)' },
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            background: #0f172a;
+            background-image: 
+                radial-gradient(at 10% 10%, rgba(59, 130, 246, 0.15) 0px, transparent 50%),
+                radial-gradient(at 90% 10%, rgba(236, 72, 153, 0.15) 0px, transparent 50%),
+                radial-gradient(at 50% 90%, rgba(16, 185, 129, 0.15) 0px, transparent 50%);
+            min-height: 100vh;
+            color: #f8fafc;
+        }
+
+        .glass-card {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .glass-button {
+            background: rgba(51, 65, 85, 0.5);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .glass-button:hover:not(:disabled) {
+            transform: translateY(-2px);
+            background: rgba(71, 85, 105, 0.7);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        /* Correct Clap Animation Modal Overlay Keyframes */
+        @keyframes clapLeft {
+            0% { transform: translate(-100px, 40px) rotate(-30deg) scale(0.6); opacity: 0; }
+            40% { transform: translate(-15px, 0px) rotate(-5deg) scale(1.15); opacity: 1; }
+            50% { transform: translate(-5px, 0px) rotate(0deg) scale(1.0); }
+            60% { transform: translate(-18px, -5px) rotate(-8deg) scale(1.1); }
+            70% { transform: translate(-5px, 0px) rotate(0deg) scale(1.0); }
+            100% { transform: translate(0px, 0px) rotate(0deg) scale(1.0); }
+        }
+
+        @keyframes clapRight {
+            0% { transform: translate(100px, 40px) rotate(30deg) scale(0.6) scaleX(-1); opacity: 0; }
+            40% { transform: translate(15px, 0px) rotate(5deg) scale(1.15) scaleX(-1); opacity: 1; }
+            50% { transform: translate(5px, 0px) rotate(0deg) scale(1.0) scaleX(-1); }
+            60% { transform: translate(18px, -5px) rotate(8deg) scale(1.1) scaleX(-1); }
+            70% { transform: translate(5px, 0px) rotate(0deg) scale(1.0) scaleX(-1); }
+            100% { transform: translate(0px, 0px) rotate(0deg) scale(1.0) scaleX(-1); }
+        }
+
+        @keyframes burstPulse {
+            0% { transform: scale(0.3); opacity: 0.9; }
+            100% { transform: scale(2.2); opacity: 0; }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-10px); }
+            40%, 80% { transform: translateX(10px); }
+        }
+
+        .animate-shake {
+            animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
+        }
+
+        .animate-clap-left {
+            animation: clapLeft 0.75s ease-out forwards;
+        }
+
+        .animate-clap-right {
+            animation: clapRight 0.75s ease-out forwards;
+        }
+
+        .animate-shockwave {
+            animation: burstPulse 0.9s cubic-bezier(0, 0, 0.2, 1) infinite;
+        }
+
+        .badge-physics { background: rgba(59, 130, 246, 0.2); color: #93c5fd; border: 1px solid rgba(59, 130, 246, 0.4); }
+        .badge-chemistry { background: rgba(16, 185, 129, 0.2); color: #6ee7b7; border: 1px solid rgba(16, 185, 129, 0.4); }
+        .badge-math { background: rgba(236, 72, 153, 0.2); color: #fbcfe8; border: 1px solid rgba(236, 72, 153, 0.4); }
+
+        /* Canvas fireworks container overlay */
+        #fx-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            pointer-events: none;
+            z-index: 40;
+        }
+    </style>
+</head>
+<body class="flex flex-col min-h-screen justify-between items-center p-3 sm:p-6 select-none overflow-x-hidden">
+
+    <!-- Canvas for Confetti & Particles -->
+    <canvas id="fx-canvas"></canvas>
+
+    <!-- Top Header & Navigation Bar -->
+    <header class="w-full max-w-4xl flex flex-col sm:flex-row items-center justify-between gap-4 mb-6 z-10">
+        <div class="flex items-center space-x-3">
+            <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-blue-600 via-emerald-500 to-pink-500 flex items-center justify-center shadow-lg shadow-blue-500/20">
+                <i class="fa-solid fa-atom text-white text-2xl animate-spin" style="animation-duration: 12s;"></i>
+            </div>
+            <div>
+                <h1 class="font-display font-extrabold text-2xl sm:text-3xl bg-gradient-to-r from-blue-400 via-emerald-400 to-pink-400 bg-clip-text text-transparent">
+                    SciQuiz Pro
+                </h1>
+                <p class="text-xs text-slate-400 font-medium">Physics • Chemistry • Mathematics</p>
+            </div>
+        </div>
+
+        <!-- Subject Selection Filter Tabs -->
+        <div id="category-filters" class="flex p-1.5 rounded-2xl glass-card space-x-1 text-xs sm:text-sm font-semibold">
+            <button onclick="setCategory('all')" id="btn-cat-all" class="px-3.5 py-1.5 rounded-xl transition-all duration-300 bg-slate-700/80 text-white shadow-md">
+                <i class="fa-solid fa-layer-group mr-1.5"></i>All
+            </button>
+            <button onclick="setCategory('physics')" id="btn-cat-physics" class="px-3.5 py-1.5 rounded-xl transition-all duration-300 text-slate-400 hover:text-physics-light">
+                <i class="fa-solid fa-bolt mr-1.5"></i>Physics
+            </button>
+            <button onclick="setCategory('chemistry')" id="btn-cat-chemistry" class="px-3.5 py-1.5 rounded-xl transition-all duration-300 text-slate-400 hover:text-chemistry-light">
+                <i class="fa-solid fa-flask mr-1.5"></i>Chemistry
+            </button>
+            <button onclick="setCategory('math')" id="btn-cat-math" class="px-3.5 py-1.5 rounded-xl transition-all duration-300 text-slate-400 hover:text-math-light">
+                <i class="fa-solid fa-square-root-variable mr-1.5"></i>Math
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Interactive Display Container -->
+    <main class="w-full max-w-4xl flex-1 flex flex-col justify-center my-2 z-10">
+
+        <!-- GAME CARD CONTAINER -->
+        <div id="game-card" class="glass-card rounded-3xl p-5 sm:p-8 shadow-2xl relative transition-all duration-500 overflow-hidden">
+            
+            <!-- Dynamic Top Status Bar -->
+            <div class="flex flex-wrap items-center justify-between gap-3 pb-5 mb-6 border-b border-slate-700/60">
+                <!-- Subject Badge & Level -->
+                <div class="flex items-center space-x-2">
+                    <span id="subject-badge" class="badge-physics px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider flex items-center gap-1.5">
+                        <i class="fa-solid fa-bolt"></i> Physics
+                    </span>
+                    <span id="difficulty-badge" class="bg-slate-800 text-slate-300 px-2.5 py-1 rounded-full text-xs font-medium border border-slate-700">
+                        Medium
+                    </span>
+                </div>
+
+                <!-- Live Score & Streak Counters -->
+                <div class="flex items-center space-x-4">
+                    <div class="flex items-center space-x-1.5 bg-slate-800/80 px-3 py-1.5 rounded-xl border border-slate-700">
+                        <i class="fa-solid fa-fire text-amber-500 text-sm"></i>
+                        <span class="text-xs text-slate-400 font-medium">Streak:</span>
+                        <span id="streak-counter" class="text-sm font-bold text-amber-400">0</span>
+                    </div>
+                    <div class="flex items-center space-x-1.5 bg-slate-800/80 px-3 py-1.5 rounded-xl border border-slate-700">
+                        <i class="fa-solid fa-trophy text-yellow-400 text-sm"></i>
+                        <span class="text-xs text-slate-400 font-medium">Score:</span>
+                        <span id="score-counter" class="text-sm font-bold text-emerald-400">0</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Progress Bar -->
+            <div class="mb-6">
+                <div class="flex justify-between text-xs text-slate-400 mb-2 font-medium">
+                    <span>Question <span id="current-q-num" class="text-white font-bold">1</span> of <span id="total-q-num">10</span></span>
+                    <span id="progress-percent" class="font-bold text-blue-400">10%</span>
+                </div>
+                <div class="w-full bg-slate-800 h-2.5 rounded-full overflow-hidden p-0.5 border border-slate-700/50">
+                    <div id="progress-bar" class="h-full bg-gradient-to-r from-blue-500 via-emerald-400 to-pink-500 rounded-full transition-all duration-500 ease-out" style="width: 10%"></div>
+                </div>
+            </div>
+
+            <!-- Question Text Box -->
+            <div class="mb-8 min-h-[90px] flex items-center">
+                <h2 id="question-text" class="font-display text-lg sm:text-2xl font-bold leading-relaxed text-slate-100">
+                    Loading question...
+                </h2>
+            </div>
+
+            <!-- Options Grid -->
+            <div id="options-grid" class="grid grid-cols-1 md:grid-cols-2 gap-3.5 mb-6">
+                <!-- Dynamic choices populated by JS -->
+            </div>
+
+            <!-- Explanation Feedback Box -->
+            <div id="explanation-box" class="hidden mt-6 p-4 rounded-2xl bg-slate-800/90 border border-slate-700 text-slate-200 text-sm leading-relaxed transition-all">
+                <div class="flex items-center space-x-2 font-bold mb-1" id="explanation-title">
+                    <i class="fa-solid fa-circle-info"></i>
+                    <span>Explanation</span>
+                </div>
+                <p id="explanation-text" class="text-slate-300 text-xs sm:text-sm"></p>
+            </div>
+
+            <!-- Footer Action Controls -->
+            <div class="mt-6 flex justify-between items-center pt-4 border-t border-slate-700/50">
+                <button onclick="resetGame()" class="text-xs text-slate-400 hover:text-slate-200 flex items-center space-x-1.5 transition">
+                    <i class="fa-solid fa-rotate-left"></i>
+                    <span>Restart Quiz</span>
+                </button>
+
+                <button id="next-btn" onclick="nextQuestion()" disabled class="px-6 py-2.5 rounded-xl bg-gradient-to-r from-blue-600 to-emerald-600 hover:from-blue-500 hover:to-emerald-500 text-white font-bold text-sm shadow-lg shadow-blue-500/25 opacity-50 cursor-not-allowed transition-all flex items-center space-x-2">
+                    <span>Next Question</span>
+                    <i class="fa-solid fa-arrow-right text-xs"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- FINAL SCORE SUMMARY SCREEN (Initially Hidden) -->
+        <div id="summary-card" class="hidden glass-card rounded-3xl p-6 sm:p-10 text-center shadow-2xl relative overflow-hidden">
+            <div class="w-20 h-20 rounded-3xl bg-gradient-to-tr from-yellow-400 to-amber-600 mx-auto flex items-center justify-center mb-6 shadow-xl shadow-amber-500/20">
+                <i class="fa-solid fa-award text-white text-4xl"></i>
+            </div>
+            
+            <h2 class="font-display text-3xl sm:text-4xl font-extrabold text-white mb-2">Quiz Completed!</h2>
+            <p class="text-slate-400 text-sm mb-8">Here is how you performed across science & math topics</p>
+
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
+                <div class="bg-slate-800/80 p-4 rounded-2xl border border-slate-700">
+                    <div class="text-xs text-slate-400 mb-1">Final Score</div>
+                    <div id="final-score" class="text-2xl font-black text-emerald-400">0</div>
+                </div>
+                <div class="bg-slate-800/80 p-4 rounded-2xl border border-slate-700">
+                    <div class="text-xs text-slate-400 mb-1">Accuracy</div>
+                    <div id="final-accuracy" class="text-2xl font-black text-blue-400">0%</div>
+                </div>
+                <div class="bg-slate-800/80 p-4 rounded-2xl border border-slate-700">
+                    <div class="text-xs text-slate-400 mb-1">Best Streak</div>
+                    <div id="final-streak" class="text-2xl font-black text-amber-400">0</div>
+                </div>
+                <div class="bg-slate-800/80 p-4 rounded-2xl border border-slate-700">
+                    <div class="text-xs text-slate-400 mb-1">Grade Badge</div>
+                    <div id="final-rank" class="text-sm font-extrabold text-pink-400 mt-1">Einstein</div>
+                </div>
+            </div>
+
+            <div class="flex flex-col sm:flex-row justify-center gap-4">
+                <button onclick="resetGame()" class="px-8 py-3 rounded-xl bg-gradient-to-r from-blue-600 via-emerald-600 to-pink-600 hover:opacity-90 text-white font-bold text-sm shadow-xl transition-all flex items-center justify-center space-x-2">
+                    <i class="fa-solid fa-rotate-right"></i>
+                    <span>Play Again</span>
+                </button>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- CELEBRATORY CLAPPING HANDS OVERLAY MODAL -->
+    <div id="clap-modal" class="fixed inset-0 pointer-events-none flex items-center justify-center z-50 opacity-0 transition-opacity duration-300">
+        <!-- Radial shockwave backdrop rings -->
+        <div class="absolute w-72 h-72 rounded-full border-4 border-yellow-400/40 animate-shockwave"></div>
+        <div class="absolute w-96 h-96 rounded-full border-2 border-emerald-400/30 animate-shockwave" style="animation-delay: 0.2s;"></div>
+
+        <div class="relative flex flex-col items-center justify-center">
+            <!-- Animated SVG Clapping Hands Pair -->
+            <div class="relative flex items-center justify-center h-44 w-80">
+                <!-- Left Hand SVG -->
+                <svg id="hand-left" class="w-32 h-32 absolute fill-amber-300 drop-shadow-[0_0_15px_rgba(251,191,36,0.6)]" viewBox="0 0 24 24">
+                    <path d="M21.5,8.5 C21.5,7.67 20.83,7 20,7 C19.74,7 19.5,7.07 19.28,7.18 C18.91,6.48 18.18,6 17.33,6 C17.06,6 16.8,6.07 16.57,6.19 C16.21,5.48 15.48,5 14.63,5 C14.36,5 14.11,5.07 13.88,5.19 C13.51,4.48 12.78,4 11.93,4 C10.97,4 10.16,4.62 9.87,5.5 L7.88,11.5 L7.15,10.77 C6.46,10.08 5.33,10.08 4.64,10.77 C3.95,11.46 3.95,12.59 4.64,13.28 L9.5,18.14 C11.38,20.02 13.88,21 16.5,21 L17,21 C19.76,21 22,18.76 22,16 L22,9 C22,8.45 21.55,8 21,8 L21.5,8.5 Z"/>
+                </svg>
+
+                <!-- Right Hand SVG (Flipped) -->
+                <svg id="hand-right" class="w-32 h-32 absolute fill-amber-300 drop-shadow-[0_0_15px_rgba(251,191,36,0.6)]" viewBox="0 0 24 24">
+                    <path d="M21.5,8.5 C21.5,7.67 20.83,7 20,7 C19.74,7 19.5,7.07 19.28,7.18 C18.91,6.48 18.18,6 17.33,6 C17.06,6 16.8,6.07 16.57,6.19 C16.21,5.48 15.48,5 14.63,5 C14.36,5 14.11,5.07 13.88,5.19 C13.51,4.48 12.78,4 11.93,4 C10.97,4 10.16,4.62 9.87,5.5 L7.88,11.5 L7.15,10.77 C6.46,10.08 5.33,10.08 4.64,10.77 C3.95,11.46 3.95,12.59 4.64,13.28 L9.5,18.14 C11.38,20.02 13.88,21 16.5,21 L17,21 C19.76,21 22,18.76 22,16 L22,9 C22,8.45 21.55,8 21,8 L21.5,8.5 Z"/>
+                </svg>
+            </div>
+
+            <!-- Dynamic Celebratory Text Tag -->
+            <div id="clap-text" class="mt-4 px-6 py-2 rounded-2xl bg-gradient-to-r from-amber-500 via-yellow-400 to-emerald-400 text-slate-950 font-display font-extrabold text-xl sm:text-2xl tracking-wider shadow-2xl transform scale-90 transition-all">
+                BRILLIANT!
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer Copyright Info -->
+    <footer class="w-full text-center text-slate-500 text-xs py-3 z-10">
+        SciQuiz Interactive STEM Platform • Powered by Web Audio & Physics Engine
+    </footer>
+
+    <script>
+        // -------------------------------------------------------------
+        // QUESTION BANK (Physics, Chemistry, Math)
+        // -------------------------------------------------------------
+        const questionsData = [
+            // PHYSICS QUESTIONS
+            {
+                subject: 'physics',
+                difficulty: 'Medium',
+                question: 'Which of Maxwell\'s equations directly predicts that magnetic monopoles do NOT exist in nature?',
+                options: [
+                    'Gauss\'s Law for Magnetism (∇ · B = 0)',
+                    'Gauss\'s Law for Electricity (∇ · E = ρ/ε₀)',
+                    'Ampère\'s Circuital Law (∇ × B = μ₀J)',
+                    'Faraday\'s Law of Induction (∇ × E = -∂B/∂t)'
+                ],
+                correct: 0,
+                explanation: 'Gauss\'s Law for Magnetism states that the divergence of the magnetic field B is zero. This implies magnetic field lines always form closed loops and isolated magnetic poles (monopoles) do not exist.'
+            },
+            {
+                subject: 'physics',
+                difficulty: 'Easy',
+                question: 'What happens to the kinetic energy of an object if its velocity is doubled?',
+                options: [
+                    'It remains the same',
+                    'It doubles (2x)',
+                    'It quadruples (4x)',
+                    'It increases by a factor of 8'
+                ],
+                correct: 2,
+                explanation: 'Kinetic Energy formula is KE = ½ mv². Because velocity v is squared, doubling the velocity results in (2)², which quadruples (4x) the overall kinetic energy.'
+            },
+            {
+                subject: 'physics',
+                difficulty: 'Hard',
+                question: 'In quantum mechanics, what principle asserts that position and momentum cannot be measured simultaneously with infinite precision?',
+                options: [
+                    'Pauli Exclusion Principle',
+                    'Heisenberg Uncertainty Principle',
+                    'De Broglie Wavelength Principle',
+                    'Schrödinger Wave Hypothesis'
+                ],
+                correct: 1,
+                explanation: 'Heisenberg\'s Uncertainty Principle states Δx · Δp ≥ ħ/2, meaning the more precisely the position of a particle is determined, the less precisely its momentum can be known.'
+            },
+
+            // CHEMISTRY QUESTIONS
+            {
+                subject: 'chemistry',
+                difficulty: 'Medium',
+                question: 'What is the molecular geometry of methane (CH₄) according to VSEPR theory?',
+                options: [
+                    'Square Planar',
+                    'Trigonal Pyramidal',
+                    'Tetrahedral',
+                    'Trigonal Bipyramidal'
+                ],
+                correct: 2,
+                explanation: 'Methane has 4 bonding electron pairs around the central carbon atom and zero lone pairs, yielding a standard tetrahedral arrangement with bond angles of 109.5°.'
+            },
+            {
+                subject: 'chemistry',
+                difficulty: 'Easy',
+                question: 'What is the pH value of a neutral aqueous solution at 25°C?',
+                options: [
+                    'pH = 0',
+                    'pH = 7',
+                    'pH = 14',
+                    'pH = 1'
+                ],
+                correct: 1,
+                explanation: 'In pure water at 25°C, [H⁺] = [OH⁻] = 1.0 × 10⁻⁷ M. The pH is calculated as -log(10⁻⁷) = 7.'
+            },
+            {
+                subject: 'chemistry',
+                difficulty: 'Hard',
+                question: 'Which subshell quantum number (l) corresponds to a d-orbital in atomic structure?',
+                options: [
+                    'l = 0',
+                    'l = 1',
+                    'l = 2',
+                    'l = 3'
+                ],
+                correct: 2,
+                explanation: 'Azimuthal quantum numbers are: s-orbital (l=0), p-orbital (l=1), d-orbital (l=2), and f-orbital (l=3).'
+            },
+
+            // MATHEMATICS QUESTIONS
+            {
+                subject: 'math',
+                difficulty: 'Medium',
+                question: 'What is the derivative of f(x) = ln(x) with respect to x?',
+                options: [
+                    '1 / x',
+                    'e^x',
+                    'x · ln(x)',
+                    '1 / (x²)'
+                ],
+                correct: 0,
+                explanation: 'The fundamental calculus derivative rule for the natural logarithm function ln(x) is d/dx [ln(x)] = 1/x for all x > 0.'
+            },
+            {
+                subject: 'math',
+                difficulty: 'Easy',
+                question: 'What is the value of Euler\'s identity term e^(iπ) + 1?',
+                options: [
+                    '0',
+                    '1',
+                    '-1',
+                    'π'
+                ],
+                correct: 0,
+                explanation: 'Euler\'s identity states e^(iπ) = -1. Therefore, e^(iπ) + 1 = -1 + 1 = 0, linking 5 key mathematical constants.'
+            },
+            {
+                subject: 'math',
+                difficulty: 'Hard',
+                question: 'If a matrix A has a determinant det(A) = 5, what is det(A⁻¹) for its inverse matrix?',
+                options: [
+                    '-5',
+                    '1/5 (0.2)',
+                    '25',
+                    '0'
+                ],
+                correct: 1,
+                explanation: 'For any invertible matrix A, det(A⁻¹) = 1 / det(A). Thus, det(A⁻¹) = 1/5.'
+            }
+        ];
+
+        // -------------------------------------------------------------
+        // GAME STATE MANAGEMENT
+        // -------------------------------------------------------------
+        let currentQuestions = [];
+        let currentIndex = 0;
+        let score = 0;
+        let streak = 0;
+        let maxStreak = 0;
+        let selectedCategory = 'all';
+        let isAnswered = false;
+
+        // Sound Synthesis via Web Audio API (No external sound files required)
+        let audioCtx = null;
+
+        function initAudio() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+        }
+
+        // Play synthesized clap burst sound
+        function playClapSound() {
+            initAudio();
+            if (!audioCtx) return;
+
+            // Generate 3 rapid noise bursts to simulate applause/clap
+            [0, 0.08, 0.18, 0.28].forEach((delay) => {
+                const bufferSize = audioCtx.sampleRate * 0.08;
+                const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+                const data = buffer.getChannelData(0);
+                for (let i = 0; i < bufferSize; i++) {
+                    data[i] = Math.random() * 2 - 1;
+                }
+
+                const noise = audioCtx.createBufferSource();
+                noise.buffer = buffer;
+
+                const filter = audioCtx.createBiquadFilter();
+                filter.type = 'bandpass';
+                filter.frequency.value = 1200 + Math.random() * 400;
+                filter.Q.value = 1.2;
+
+                const gain = audioCtx.createGain();
+                gain.gain.setValueAtTime(0.4, audioCtx.currentTime + delay);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + delay + 0.07);
+
+                noise.connect(filter);
+                filter.connect(gain);
+                gain.connect(audioCtx.destination);
+
+                noise.start(audioCtx.currentTime + delay);
+            });
+        }
+
+        // Play error sound
+        function playErrorSound() {
+            initAudio();
+            if (!audioCtx) return;
+
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = 'sawtooth';
+            osc.frequency.setValueAtTime(160, audioCtx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(80, audioCtx.currentTime + 0.25);
+
+            gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.25);
+
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.25);
+        }
+
+        // -------------------------------------------------------------
+        // UI RENDER FUNCTIONS
+        // -------------------------------------------------------------
+        function setCategory(cat) {
+            selectedCategory = cat;
+            
+            // Highlight active filter tab
+            ['all', 'physics', 'chemistry', 'math'].forEach(c => {
+                const btn = document.getElementById(`btn-cat-${c}`);
+                if (c === cat) {
+                    btn.className = 'px-3.5 py-1.5 rounded-xl transition-all duration-300 bg-slate-700 text-white shadow-md border border-slate-600';
+                } else {
+                    btn.className = 'px-3.5 py-1.5 rounded-xl transition-all duration-300 text-slate-400 hover:text-white';
+                }
+            });
+
+            resetGame();
+        }
+
+        function filterQuestions() {
+            if (selectedCategory === 'all') {
+                currentQuestions = [...questionsData];
+            } else {
+                currentQuestions = questionsData.filter(q => q.subject === selectedCategory);
+            }
+            // Shuffle questions
+            currentQuestions.sort(() => Math.random() - 0.5);
+        }
+
+        function loadQuestion() {
+            isAnswered = false;
+            const q = currentQuestions[currentIndex];
+
+            // Hide explanation
+            document.getElementById('explanation-box').classList.add('hidden');
+            
+            // Reset next button
+            const nextBtn = document.getElementById('next-btn');
+            nextBtn.disabled = true;
+            nextBtn.classList.add('opacity-50', 'cursor-not-allowed');
+
+            // Update Progress
+            const progress = ((currentIndex + 1) / currentQuestions.length) * 100;
+            document.getElementById('progress-bar').style.width = `${progress}%`;
+            document.getElementById('progress-percent').innerText = `${Math.round(progress)}%`;
+            document.getElementById('current-q-num').innerText = currentIndex + 1;
+            document.getElementById('total-q-num').innerText = currentQuestions.length;
+
+            // Update Subject Badge
+            const badge = document.getElementById('subject-badge');
+            if (q.subject === 'physics') {
+                badge.className = 'badge-physics px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider flex items-center gap-1.5';
+                badge.innerHTML = '<i class="fa-solid fa-bolt"></i> Physics';
+            } else if (q.subject === 'chemistry') {
+                badge.className = 'badge-chemistry px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider flex items-center gap-1.5';
+                badge.innerHTML = '<i class="fa-solid fa-flask"></i> Chemistry';
+            } else {
+                badge.className = 'badge-math px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider flex items-center gap-1.5';
+                badge.innerHTML = '<i class="fa-solid fa-square-root-variable"></i> Mathematics';
+            }
+
+            document.getElementById('difficulty-badge').innerText = q.difficulty;
+            document.getElementById('question-text').innerText = q.question;
+
+            // Render Option Buttons
+            const grid = document.getElementById('options-grid');
+            grid.innerHTML = '';
+
+            const prefixes = ['A', 'B', 'C', 'D'];
+
+            q.options.forEach((opt, idx) => {
+                const btn = document.createElement('button');
+                btn.className = `glass-button w-full p-4 rounded-2xl text-left flex items-center space-x-3 text-slate-200 hover:text-white group`;
+                btn.onclick = () => selectOption(idx);
+                btn.id = `opt-btn-${idx}`;
+
+                btn.innerHTML = `
+                    <span class="w-8 h-8 rounded-xl bg-slate-800 border border-slate-700 font-bold text-xs flex items-center justify-center text-slate-400 group-hover:border-slate-500 group-hover:text-white transition-colors">
+                        ${prefixes[idx]}
+                    </span>
+                    <span class="flex-1 font-medium text-sm sm:text-base">${opt}</span>
+                    <i class="fa-solid fa-circle-check text-emerald-400 opacity-0 transition-opacity text-lg" id="icon-${idx}"></i>
+                `;
+                grid.appendChild(btn);
+            });
+        }
+
+        function selectOption(index) {
+            if (isAnswered) return;
+            isAnswered = true;
+
+            const q = currentQuestions[currentIndex];
+            const isCorrect = (index === q.correct);
+            const selectedBtn = document.getElementById(`opt-btn-${index}`);
+            const card = document.getElementById('game-card');
+
+            // Enable next button
+            const nextBtn = document.getElementById('next-btn');
+            nextBtn.disabled = false;
+            nextBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+
+            if (isCorrect) {
+                // Correct styling
+                selectedBtn.classList.remove('glass-button');
+                selectedBtn.classList.add('bg-emerald-600/30', 'border-emerald-500', 'text-white', 'shadow-lg', 'shadow-emerald-500/20');
+                document.getElementById(`icon-${index}`).classList.remove('opacity-0');
+
+                score += 100 + (streak * 20);
+                streak++;
+                if (streak > maxStreak) maxStreak = streak;
+
+                // Play Audio & Trigger Clap Modal Overlay
+                playClapSound();
+                triggerClapCelebration();
+                spawnFireworks();
+
+            } else {
+                // Shake card & play wrong sound
+                playErrorSound();
+                card.classList.add('animate-shake');
+                setTimeout(() => card.classList.remove('animate-shake'), 500);
+
+                // Incorrect button style
+                selectedBtn.classList.remove('glass-button');
+                selectedBtn.classList.add('bg-rose-600/30', 'border-rose-500', 'text-white');
+                document.getElementById(`icon-${index}`).className = 'fa-solid fa-circle-xmark text-rose-400 text-lg';
+
+                // Highlight correct answer
+                const correctBtn = document.getElementById(`opt-btn-${q.correct}`);
+                correctBtn.classList.remove('glass-button');
+                correctBtn.classList.add('bg-emerald-600/20', 'border-emerald-500/60');
+
+                streak = 0;
+            }
+
+            // Update UI Score Counters
+            document.getElementById('score-counter').innerText = score;
+            document.getElementById('streak-counter').innerText = streak;
+
+            // Show Detailed Explanation
+            const expBox = document.getElementById('explanation-box');
+            const expTitle = document.getElementById('explanation-title');
+            const expText = document.getElementById('explanation-text');
+
+            expBox.classList.remove('hidden');
+            if (isCorrect) {
+                expTitle.className = 'flex items-center space-x-2 font-bold mb-1 text-emerald-400';
+                expTitle.innerHTML = '<i class="fa-solid fa-circle-check"></i><span>Correct Answer!</span>';
+            } else {
+                expTitle.className = 'flex items-center space-x-2 font-bold mb-1 text-rose-400';
+                expTitle.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i><span>Incorrect</span>';
+            }
+            expText.innerText = q.explanation;
+        }
+
+        // TRIGGER BEAUTIFUL CLAPPING CELEBRATION
+        function triggerClapCelebration() {
+            const modal = document.getElementById('clap-modal');
+            const handLeft = document.getElementById('hand-left');
+            const handRight = document.getElementById('hand-right');
+            const clapText = document.getElementById('clap-text');
+
+            const cheers = ['EXCELLENT!', 'SPOT ON!', 'BRILLIANT!', 'GENIUS!', 'PERFECT!'];
+            clapText.innerText = cheers[Math.floor(Math.random() * cheers.length)];
+
+            // Reset Animation Classes
+            handLeft.classList.remove('animate-clap-left');
+            handRight.classList.remove('animate-clap-right');
+            
+            // Force reflow
+            void handLeft.offsetWidth;
+
+            // Add Animation Classes
+            handLeft.classList.add('animate-clap-left');
+            handRight.classList.add('animate-clap-right');
+
+            // Fade in modal
+            modal.classList.remove('opacity-0');
+            modal.classList.add('opacity-100');
+
+            setTimeout(() => {
+                modal.classList.remove('opacity-100');
+                modal.classList.add('opacity-0');
+            }, 1200);
+        }
+
+        function nextQuestion() {
+            if (currentIndex < currentQuestions.length - 1) {
+                currentIndex++;
+                loadQuestion();
+            } else {
+                showSummary();
+            }
+        }
+
+        function showSummary() {
+            document.getElementById('game-card').classList.add('hidden');
+            const summary = document.getElementById('summary-card');
+            summary.classList.remove('hidden');
+
+            const accuracy = Math.round((score / (currentQuestions.length * 100)) * 100);
+            document.getElementById('final-score').innerText = score;
+            document.getElementById('final-accuracy').innerText = `${accuracy}%`;
+            document.getElementById('final-streak').innerText = maxStreak;
+
+            let rank = 'Apprentice';
+            if (accuracy >= 90) rank = 'Quantum Master';
+            else if (accuracy >= 70) rank = 'Senior Researcher';
+            else if (accuracy >= 50) rank = 'Lab Assistant';
+
+            document.getElementById('final-rank').innerText = rank;
+        }
+
+        function resetGame() {
+            currentIndex = 0;
+            score = 0;
+            streak = 0;
+            maxStreak = 0;
+
+            document.getElementById('score-counter').innerText = '0';
+            document.getElementById('streak-counter').innerText = '0';
+
+            document.getElementById('summary-card').classList.add('hidden');
+            document.getElementById('game-card').classList.remove('hidden');
+
+            filterQuestions();
+            loadQuestion();
+        }
+
+        // -------------------------------------------------------------
+        // CANVAS FIREWORKS & CONFETTI ENGINE
+        // -------------------------------------------------------------
+        const canvas = document.getElementById('fx-canvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        class Particle {
+            constructor(x, y, color) {
+                this.x = x;
+                this.y = y;
+                this.color = color;
+                this.radius = Math.random() * 4 + 2;
+                this.vx = (Math.random() - 0.5) * 12;
+                this.vy = (Math.random() - 0.5) * 12 - 2;
+                this.alpha = 1;
+                this.friction = 0.95;
+                this.gravity = 0.15;
+            }
+
+            draw() {
+                ctx.save();
+                ctx.globalAlpha = this.alpha;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                ctx.fillStyle = this.color;
+                ctx.shadowBlur = 10;
+                ctx.shadowColor = this.color;
+                ctx.fill();
+                ctx.restore();
+            }
+
+            update() {
+                this.vx *= this.friction;
+                this.vy *= this.friction;
+                this.vy += this.gravity;
+                this.x += this.vx;
+                this.y += this.vy;
+                this.alpha -= 0.015;
+            }
+        }
+
+        function spawnFireworks() {
+            const colors = ['#3b82f6', '#10b981', '#ec4899', '#f59e0b', '#67e8f9'];
+            const centerX = window.innerWidth / 2;
+            const centerY = window.innerHeight / 2;
+
+            for (let i = 0; i < 60; i++) {
+                const color = colors[Math.floor(Math.random() * colors.length)];
+                particles.push(new Particle(centerX, centerY, color));
+            }
+        }
+
+        function animateParticles() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            particles = particles.filter(p => p.alpha > 0);
+            particles.forEach(p => {
+                p.update();
+                p.draw();
+            });
+            requestAnimationFrame(animateParticles);
+        }
+
+        // Initialize Game on Load
+        window.onload = function() {
+            resetGame();
+            animateParticles();
+        };
+    </script>
+</body>
+</html>
